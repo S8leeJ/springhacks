@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -14,8 +15,8 @@ function App() {
           <Route path="/" element={<Navigate to="/signin" />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

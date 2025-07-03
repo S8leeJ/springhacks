@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function SignUp() {
     const [email, setEmail] = useState('');
@@ -10,7 +11,6 @@ export default function SignUp() {
           const res = await fetch('http://localhost:5001/api/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', // 👈 Required when credentials: true is set on the backend
             body: JSON.stringify({ email, password }),
           });
           const data = await res.json();
@@ -56,6 +56,8 @@ export default function SignUp() {
                     >
                         Sign Up
                     </button>
+                    <p className="text-center text-gray-500">Have an account? <Link to="/signin" className="text-blue-500 hover:text-blue-600">Sign In</Link></p>
+
                 </form>
             </div>
         </div>

@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await fetch('http://localhost:5001/api/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // 👈 Required when credentials: true is set on the backend
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem('token', data.token);
+        navigate('/home');
         alert('Sign in successful!');
       } else {
         alert(data.message || 'Sign in failed');
@@ -55,6 +60,8 @@ export default function SignIn() {
           >
             Sign In
           </button>
+          <p className="text-center text-gray-500">Don't have an account? <Link to="/signup" className="text-blue-500 hover:text-blue-600">Sign Up</Link></p>
+          
         </form>
       </div>
     </div>
