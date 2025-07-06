@@ -5,22 +5,37 @@ import Navbar from './components/Navbar';
 import SignUp from './pages/SignUp';
 import SignIn from './pages/SignIn';
 import ProtectedRoute from './components/ProtectedRoute';
+import { useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+
 
 function App() {
   return (
-    <Router>
-      <div className="bg-blue-300 min-h-screen">
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Navigate to="/signin" />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-        </Routes>
+    <AuthProvider>
+      <div className='bg-gradient-to-br from-red-400 via-pink-500 to-pink-200'>
+        <Router>
+          <AppContent />
+        </Router>
       </div>
-    </Router>
+    </AuthProvider>
   );
 }
 
+function AppContent() {
+  const location = useLocation();
+  const hideNavbarRoutes = ['/', '/signup'];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+
+  return (
+    <div>
+      {shouldShowNavbar && <Navbar />}
+      <Routes>
+        <Route path='/' element={<SignIn />} />
+        <Route path='/signup' element={<SignUp />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+      </Routes>
+    </div>
+  )
+}
 export default App;
