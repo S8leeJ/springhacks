@@ -12,15 +12,15 @@ export default function Navbar() {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 bg-pink-500 text-white">
+        <div className="flex items-center justify-between p-4 bg-pink-300 text-white">
             <div className="flex gap-4">
-                <Link to="/" className="text-white hover:text-gray-200">Home</Link>
-                <Link to="/dashboard" className="text-white hover:text-gray-200">Dashboard</Link>
+                <Link to="/home" className="text-pink-700 text-lg text-bold hover:text-pink-900">Home</Link>
+                <Link to="/dashboard" className="text-pink-700 text-lg text-bold hover:text-pink-900">Dashboard</Link>
             </div>
             {isLoggedIn && (
                 <button
                     onClick={handleLogout}
-                    className="bg-white text-blue-500 px-4 py-2 rounded hover:bg-gray-100 font-semibold"
+                    className="bg-white text-pink-500 px-4 py-2 rounded hover:bg-pink-100 font-semibold"
                 >
                     Logout
                 </button>

@@ -30,9 +30,12 @@ export default function SignUp() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-pink-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">Sign Up</h2>
+        <h1 className="text-3xl font-bold mb-2 text-center text-pink-400">Create an account</h1>
+
+        <h2 className="text-1xl mb-6 text-center text-gray-500">Create an account to get started</h2>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700 mb-1">Email</label>
@@ -56,11 +59,11 @@ export default function SignUp() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+              className="w-full bg-pink-400 hover:bg-pink-500 text-white font-semibold py-2 px-4 rounded transition duration-200"
           >
             Sign Up
           </button>
-          <p className="text-center text-gray-500">Have an account? <Link to="/signin" className="text-blue-500 hover:text-blue-600">Sign In</Link></p>
+            <p className="text-center text-gray-500">Already have an account? <Link to="/" className="text-pink-400 hover:text-pink-500">Sign In</Link></p>
 
         </form>
       </div>

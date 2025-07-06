@@ -12,7 +12,7 @@ import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
     <AuthProvider>
-      <div className='bg-gradient-to-br from-red-400 via-pink-500 to-pink-200'>
+      <div className='bg-pink-100'>
         <Router>
           <AppContent />
         </Router>
