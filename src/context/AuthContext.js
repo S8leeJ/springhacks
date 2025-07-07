@@ -11,7 +11,8 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
+  
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         setToken(data.token);
-        setUser({ email });
+        setUser({ email, name: data.name });
         localStorage.setItem('token', data.token);
         return { success: true };
       } else {
@@ -76,14 +77,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signup = async (email, password) => {
+  const signup = async (name, email, password) => {
     try {
       const response = await fetch('http://localhost:5001/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
