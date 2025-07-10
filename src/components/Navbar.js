@@ -15,17 +15,34 @@ export default function Navbar() {
     return (
         <div className="flex items-center justify-between p-4 bg-pink-300 text-white">
             <div className="flex gap-4">
-            <h1 className="text-white-700 text-lg text-bold">Tidbit</h1>
-
-                <Link to="/home" className="text-pink-700 text-lg text-bold hover:text-pink-900">Home</Link>
-                <Link to="/dashboard" className="text-pink-700 text-lg text-bold hover:text-pink-900">Dashboard</Link>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-10 w-10 mr-2"
+                viewBox="0 0 32 32"
+                fill="none"
+            >
+                <circle cx="16" cy="16" r="15" fill="#ec4899" stroke="#db2777" strokeWidth="2"/>
+                <rect x="10" y="8" width="12" height="16" rx="3" fill="white" />
+                <rect x="13" y="11" width="6" height="2" rx="1" fill="#f472b6" />
+                <rect x="13" y="15" width="6" height="2" rx="1" fill="#f472b6" />
+                <rect x="13" y="19" width="4" height="2" rx="1" fill="#f472b6" />
+                <circle cx="22" cy="10" r="3" fill="#f472b6" stroke="#db2777" strokeWidth="1"/>
+                <path d="M22 8.5v3" stroke="#db2777" strokeWidth="1" strokeLinecap="round"/>
+                <path d="M20.5 10h3" stroke="#db2777" strokeWidth="1" strokeLinecap="round"/>
+            </svg>
+            <h1 className="text-pink-700 text-2xl font-extrabold tracking-tight drop-shadow-lg flex items-center">
+                Tidbit
+            </h1>   
+                <Link to="/home" className="text-pink-600 text-2xl tracking-tight drop-shadow-lg flex items-center hover:text-pink-200">Play War</Link>
+                <Link to="/dashboard" className="text-pink-600 text-2xl tracking-tight drop-shadow-lg flex items-center hover:text-pink-200">Dashboard</Link>
             </div>
 
             {isLoggedIn && (
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-4">
-                        <span className="text-white text-lg text-bold">Welcome, {user.name}</span>
-
+                        {user && (
+                            <span className="text-white text-2xl tracking-tight drop-shadow-lg flex items-center">Welcome, {user.name}</span>
+                        )}
                     </div>
                      <Link to="/settings" className="hover:text-pink-900" title="Settings">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-pink-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">

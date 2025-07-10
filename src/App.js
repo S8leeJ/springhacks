@@ -23,7 +23,7 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/', '/signup'];
+  const hideNavbarRoutes = ['/', '/signup', '/signin'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
   return (
@@ -31,6 +31,7 @@ function AppContent() {
       {shouldShowNavbar && <Navbar />}
       <Routes>
         <Route path='/' element={<SignIn />} />
+        <Route path='/signin' element={<SignIn />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />

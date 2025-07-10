@@ -1,95 +1,139 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
-export default function Todo() {
-  const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState('');
-  const [todoListName, setTodoListName] = useState('');
-  const [todoList, setTodoList] = useState([]);
+export default function Home() {
+  const { user, token, loading } = useAuth();
+  const navigate = useNavigate();
+  const socketRef = useRef(null);
+  const [roomId, setRoomId] = useState('');
+  const [players, setPlayers] = useState([]);
+  const [message, setMessage] = useState('');
+  const [gameStarted, setGameStarted] = useState(false);
 
+  // Redirect to signin if not authenticated
   useEffect(() => {
-    const fetchTodoList = async () => {
-      const response = await fetch(`/api/todo-list/${todoListName}`);
-      const data = await response.json();
-      setTodoList(data);    
-    };
-    fetchTodoList();
-  }, [todoListName]);
+    if (!loading && !user) {
+      navigate('/signin');
+    }
+  }, [user, loading, navigate]);
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    setTodos([...todos, { text: input, done: false }]);
+  // Connect to Socket.IO with JWT
+  useEffect(() => {
+    if (user && token) {
+      socketRef.current = io('http://localhost:5001', {
+        auth: { token }
+      });
+
+      // Listen for welcome message
+      socketRef.current.on('welcome', (msg) => {
+        setMessage(msg);
+      });
+
+      // Listen for player list updates
+      socketRef.current.on('player_list', (playerList) => {
+        setPlayers(playerList);
+      });
+
+      // Listen for game start
+      socketRef.current.on('game_start', (msg) => {
+        setMessage(msg);
+        setGameStarted(true);
+      });
+
+      // Listen for room full error
+      socketRef.current.on('room_full', (msg) => {
+        setMessage(msg);
+      });
+
+      // Clean up on unmount
+      return () => {
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+        }
+      };
+    }
+  }, [user, token]);
+
+  const handleJoinRoom = () => {
+    if (roomId.trim() && socketRef.current) {
+      socketRef.current.emit('join_room', roomId);
+      setMessage('Joining room...');
+    }
   };
 
-
-  const toggleDone = (idx) => {
-    setTodos(todos.map((todo, i) =>
-      i === idx ? { ...todo, done: !todo.done } : todo
-    ));
+  const handleCreateRoom = () => {
+    const newRoomId = Math.random().toString(36).substring(2, 8);
+    setRoomId(newRoomId);
+    if (socketRef.current) {
+      socketRef.current.emit('join_room', newRoomId);
+      setMessage('Creating and joining room...');
+    }
   };
 
-  const handleDelete = (idx) => {
-    setTodos(todos.filter((_, i) => i !== idx));
-  };
+  if (loading || !user) return <div>Loading...</div>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-blue-100 to-purple-200">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center">
-        <div className="w-full flex items-center justify-center mb-6">
-          <input
-            type="text"
-            value={typeof todoListName !== 'undefined' ? todoListName : ''}
-            onChange={e => setTodoListName(e.target.value)}
-            className="text-3xl font-extrabold text-center text-blue-700 tracking-tight drop-shadow bg-transparent border-b-2 border-blue-200 focus:outline-none focus:border-blue-400 transition w-full max-w-xs"
-            style={{ background: 'none' }}
-            aria-label="Todo List Name"
-          />
+    <div className="p-8 max-w-2xl mx-auto bg-pink-100 h-screen">
+      <h2 className="text-3xl font-bold mb-6 text-pink-700">Welcome to War, {user.name}!</h2>
+      
+      {message && (
+        <div className="mb-4 p-3 bg-pink-100 text-pink-800 rounded">
+          {message}
         </div>
-        <form onSubmit={handleAdd} className="flex w-full mb-6 gap-2">
-          <input
-            className="flex-1 border-2 border-blue-200 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="Add a new todo"
-          />
-          <button
-            type="submit"
-            className="bg-gradient-to-r from-blue-400 to-pink-400 text-white px-6 py-2 rounded-r-lg font-semibold shadow hover:from-blue-500 hover:to-pink-500 transition"
-          >
-            Add
-          </button>
-        </form>
-        <ul className="w-full">
-          {todos.length === 0 && (
-            <li className="text-center text-gray-400 py-8">No todos yet. Add one!</li>
-          )}
-          {todos.map((todo, idx) => (
-            <li
-              key={idx}
-              className="flex items-center justify-between mb-3 bg-blue-50 rounded-lg px-4 py-2 shadow-sm hover:bg-blue-100 transition group"
+      )}
+
+      {!gameStarted && (
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold mb-4">Join or Create a Game</h3>
+          
+          <div className="flex gap-4 mb-4">
+            <input
+              type="text"
+              placeholder="Enter room ID"
+              value={roomId}
+              onChange={(e) => setRoomId(e.target.value)}
+              className="flex-1 p-2 border border-pink-300 rounded"
+            />
+            <button
+              onClick={handleJoinRoom}
+              className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
             >
-              <span
-                onClick={() => toggleDone(idx)}
-                className={`flex-1 cursor-pointer select-none transition text-lg ${todo.done ? 'line-through text-gray-400' : 'text-blue-900'} group-hover:scale-105`}
-              >
-                {todo.done ? (
-                  <span className="inline-block align-middle mr-2 text-green-400 animate-bounce">✔</span>
-                ) : (
-                  <span className="inline-block align-middle mr-2 text-gray-300">○</span>
-                )}
-                {todo.text}
-              </span>
-              <button
-                onClick={() => handleDelete(idx)}
-                className="ml-4 text-pink-500 hover:text-pink-700 font-bold px-2 py-1 rounded transition"
-                title="Delete"
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
+              Join Room
+            </button>
+          </div>
+          
+          <button
+            onClick={handleCreateRoom}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Create New Room
+          </button>
+        </div>
+      )}
+
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold mb-2">Players in Room:</h3>
+        {players.length === 0 ? (
+          <p className="text-gray-600">No players yet</p>
+        ) : (
+          <ul className="space-y-2">
+            {players.map((player, idx) => (
+              <li key={idx} className="p-2 bg-pink-50 rounded">
+                {player.name} {player.id === user.id && '(You)'}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
+
+      {gameStarted && (
+        <div className="p-4 bg-green-100 text-green-800 rounded">
+          <h3 className="text-lg font-semibold">Game Started!</h3>
+          <p>Game logic will be implemented here...</p>
+        </div>
+      )}
     </div>
   );
 }
